@@ -27,7 +27,7 @@ class Lexer:
         combined_pattern = '|'.join(f'(?P<{name}>{pattern})' for name, pattern in patterns)
 
         #go through the code to find the matches
-        for match in re.finditer(combined_pattern, self.input_code):
+        for match in re.finditer(combined_pattern, self.source_code):
             token_type = match.lastgroup
             token_value = match.group(token_type)
 

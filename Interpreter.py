@@ -1,26 +1,41 @@
-from AST_node import AssignNode, BinOpNode, PrintNode
+from AST_node import AssignNode,BinOpNode,PrintNode
 
 class Interpreter:
     def __init__(self):
-        self.vars = {}
+        self.variables = {}  # Environment to store variable values
 
     def visit(self, node):
         if isinstance(node, AssignNode):
-            self.vars[node.var_name] = node.expr  
+            # Evaluate the expression and assign it to the variable
+            value = self.visit(node.expr)
+            self.variables[node.var_name] = value
         elif isinstance(node, BinOpNode):
+            # Evaluate both sides of the binary operation
+            left = self.visit(node.left)
+            right = self.visit(node.right)
             if node.op == "PLUS":
-                return node.left + node.right
+                return left + right
             elif node.op == "MINUS":
-                return node.left - node.right
+                return left - right
             elif node.op == "MUL":
                 return left * right
             elif node.op == "DIV":
-                return node.left / node.right
+                if right == 0:
+                    raise ZeroDivisionError("Division by zero is not allowed")
+                return left / right
+            else:
+                raise ValueError(f"Invalid binary operation: {node.op}")
         elif isinstance(node, PrintNode):
-            print(node.expr)
+            # Evaluate the expression and print the result
+            print(self.visit(node.expr))
         elif isinstance(node, int):
+            # Return numeric literals directly
             return node
         elif isinstance(node, str):
-            return self.vars[node]
+            # Look up variable values
+            if node in self.variables:
+                return self.variables[node]
+            else:
+                raise NameError(f"Variable '{node}' is not defined")
         else:
-            raise ValueError("Node type not supported")
+            raise ValueError(f"Unsupported node type: {type(node)}")
